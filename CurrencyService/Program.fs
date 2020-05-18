@@ -1,5 +1,4 @@
 ﻿// Learn more about F# at http://fsharp.org
-
 open System
 open System.Threading.Tasks
 open Microsoft.Extensions.DependencyInjection
@@ -7,7 +6,7 @@ open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.Configuration
 open System.IO
-
+open CurrencyService
 
 type Worker(logger : ILogger<Worker>) =
     inherit BackgroundService()
@@ -16,7 +15,9 @@ type Worker(logger : ILogger<Worker>) =
         let f : Async<unit> = async {
             while not stoppingToken.IsCancellationRequested do
                 _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now)
-                do! Async.Sleep(1000)
+                Service.getAllCurrencies
+                |> List.iter (fun currency -> printfn "%s" currency.Symbol)
+                do! Async.Sleep(5000)
         }
         // ExecuteAsync needs to return a task, hence up-cast from Task<unit> to plain Task.
         Async.StartAsTask f :> Task
